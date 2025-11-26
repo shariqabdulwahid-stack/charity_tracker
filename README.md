@@ -38,5 +38,6 @@ Charity Tracker is an online directory of charitable campaigns.
 
 
 ## Deployment
-Live site: [[https://your‑render‑url.onrender.com](https://your‑render‑url.onrender.com)  ](https://charity-tracker.onrender.com)
-GitHub repo: [[https://github.com/your‑username/charity‑tracker](https://github.com/your‑username/charity‑tracker)](https://github.com/shariqabdulwahid-stack/charity_tracker.git)
+Live site: https://charity-tracker.onrender.com
+
+GitHub repo: https://github.com/shariqabdulwahid-stack/charity_tracker.git
