@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <%- include('../layouts/header') %>
+<body>
+  <%- include('../layouts/main_navbar', { req: req }) %>
+
+  <div class="container py-4">
+    <h1 class="h3 mb-4">Active Campaigns</h1>
+
+    <!-- Search bar -->
+    <form class="input-group mb-4" method="GET" action="/campaigns/search">
+      <span class="input-group-text"><i class="bi bi-search"></i></span>
+      <input type="text" name="q" class="form-control" placeholder="Search campaigns..." />
+      <button class="btn btn-outline-primary">Search</button>
+    </form>
+
+    <div class="row g-4">
+      <% if (campaignList.length === 0) { %>
+        <div class="text-center text-muted">
+          <p>No campaigns yet. Be the first to create one!</p>
+          <a href="/campaigns/new" class="btn btn-primary">Create Campaign</a>
+        </div>
+      <% } %>
+
+      <% campaignList.forEach(c => {
+        const pct = c.goalAmount ? Math.min(100, Math.round((c.currentAmount / c.goalAmount) * 100)) : 0;
+      %>
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-body">
+              <h5 class="card-title fw-semibold"><%= c.title %></h5>
+              <p class="card-text text-muted"><%= c.description %></p>
+              <div class="progress mb-2" style="height: 6px;">
+                <div class="progress-bar bg-success" style="width:<%= pct %>%"></div>
+              </div>
+              <p class="small text-muted">Raised $<%= c.currentAmount %> of $<%= c.goalAmount %></p>
+            </div>
+            <div class="card-footer bg-white border-0 d-flex justify-content-between">
+              <a href="/campaigns/<%= c._id %>" class="btn btn-sm btn-outline-primary">View</a>
+              <% if (req.session?.user) { %>
+                <a href="/campaigns/<%= c._id %>/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
+                <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal-<%= c._id %>">Delete</button>
+              <% } %>
+            </div>
+          </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div class="modal fade" id="deleteModal-<%= c._id %>" tabindex="-1">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <form method="POST" action="/campaigns/<%= c._id %>?_method=DELETE">
+                <div class="modal-header">
+                  <h5 class="modal-title">Confirm Delete</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                  Are you sure you want to delete "<%= c.title %>"?
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                  <button type="submit" class="btn btn-danger">Delete</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      <% }) %> 
+    </div>
+  </div>
+
+  <%- include('../layouts/footer') %>
+</body>
+</html>

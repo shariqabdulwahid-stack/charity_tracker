@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <%- include('../layouts/header') %>
+<body>
+  <%- include('../layouts/main_navbar', { req: req }) %>
+
+  <div class="container py-4">
+    <!-- Campaign details -->
+    <h1 class="h3 mb-3"><%= campaign.title %></h1>
+    <p><%= campaign.description %></p>
+
+    <!-- Progress bar -->
+    <% const pct = campaign.goalAmount ? Math.min(100, Math.round((campaign.currentAmount / campaign.goalAmount) * 100)) : 0; %>
+    <div class="progress mb-2" style="height: 8px;">
+      <div class="progress-bar bg-success" style="width:<%= pct %>%"></div>
+    </div>
+    <p class="small text-muted">Raised $<%= campaign.currentAmount %> of $<%= campaign.goalAmount %></p>
+
+    <!-- CRUD buttons -->
+    <a class="btn btn-success mb-3" href="/donations/new/<%= campaign._id %>">Add Donation</a>
+    <% if (req.session?.user) { %>
+      <a class="btn btn-outline-secondary mb-3" href="/campaigns/<%= campaign._id %>/edit">Edit Campaign</a>
+      <button class="btn btn-outline-danger mb-3" data-bs-toggle="modal" data-bs-target="#deleteCampaignModal">Delete Campaign</button>
+    <% } %>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteCampaignModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <form method="POST" action="/campaigns/<%= campaign._id %>?_method=DELETE">
+            <div class="modal-header">
+              <h5 class="modal-title">Confirm Delete</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              Are you sure you want to delete "<%= campaign.title %>"?
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-danger">Delete</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Donations list -->
+    <h2 class="h5 mt-4">Donations</h2>
+    <% if (donations.length === 0) { %>
+      <p class="text-muted">No donations yet. Be the first to contribute!</p>
+    <% } else { %>
+      <table class="table table-sm">
+        <thead>
+          <tr>
+            <th>Donor</th>
+            <th>Amount</th>
+            <th>Date</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% donations.forEach(d => { %>
+            <tr>
+              <td><%= d.donorName || 'Anonymous' %></td>
+              <td>$<%= d.amount %></td>
+              <td><%= d.createdAt.toLocaleDateString() %></td>
+              <td>
+                <% if (req.session?.user) { %>
+                  <a href="/donations/<%= d._id %>/edit" class="btn btn-outline-secondary btn-sm">Edit</a>
+                  <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteDonationModal-<%= d._id %>">Delete</button>
+                <% } %>
+              </td>
+            </tr>
+
+            <!-- Donation Delete Modal -->
+            <div class="modal fade" id="deleteDonationModal-<%= d._id %>" tabindex="-1">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <form method="POST" action="/donations/<%= d._id %>?_method=DELETE">
+                    <input type="hidden" name="campaignId" value="<%= campaign._id %>" />
+                    <div class="modal-header">
+                      <h5 class="modal-title">Confirm Delete</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                      Delete donation from "<%= d.donorName || 'Anonymous' %>"?
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                      <button type="submit" class="btn btn-danger">Delete</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } %>
+  </div>
+
+  <%- include('../layouts/footer') %>
+</body>
+</html>

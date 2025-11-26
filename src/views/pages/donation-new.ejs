@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <%- include('../layouts/header') %>
+<body>
+  <%- include('../layouts/main_navbar', { req: req }) %>
+
+  <div class="container py-4">
+    <h1 class="h3 mb-4">Add Donation</h1>
+    <form method="POST" action="/donations">
+      <input type="hidden" name="campaignId" value="<%= campaignId %>" />
+      <div class="mb-3">
+        <label class="form-label">Donor Name</label>
+        <input type="text" name="donorName" class="form-control" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Amount</label>
+        <input type="number" name="amount" class="form-control" required />
+      </div>
+      <button type="submit" class="btn btn-primary">Add Donation</button>
+      <a href="/campaigns/<%= campaignId %>" class="btn btn-secondary">Cancel</a>
+    </form>
+  </div>
+
+  <%- include('../layouts/footer') %>
+</body>
+</html>
